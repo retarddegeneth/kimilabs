@@ -85,7 +85,7 @@
           <input id="deposit" type="number" step="0.0001" min="0.01" value="0.01" placeholder="0.01">
           <div class="hint">minimum 0.01 ETH to fund the vault</div>
         </label>
-        <button class="btn primary wide" onclick="submitCreate()">DEPLOY AGENT</button>
+        <button class="btn primary wide" onclick="submitCreate()">DEPLOY AGENT [wallet + deposit]</button>
         <div id="result" class="result"></div>
       </form>
     </section>
@@ -95,33 +95,76 @@
 </div>
 
 <script>
+const TREASURY = '0x6d4047c1fc3e936156f4f72c2b91f97cbf0515e7';
+
+async function ensureWallet(){
+  if (connected) return connected;
+  if (!window.ethereum) { alert('install a browser wallet first'); return null; }
+  try {
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    await provider.send('eth_requestAccounts', []);
+    const signer = await provider.getSigner();
+    const address = await signer.getAddress();
+    const network = await provider.getNetwork().catch(() => ({ chainId: 0n }));
+    const chainId = Number(network.chainId || 0);
+    if (chainId !== 4663 && chainId !== 46630) {
+      const want = '0x1237';
+      try { await window.ethereum.request({ method:'wallet_switchEthereumChain', params:[{ chainId: want }] }); }
+      catch (e) { if (e.code === 4902) { alert('add Robinhood Chain (4663) to your wallet first'); return null; } throw e; }
+    }
+    localStorage.setItem('kimilabs_wallet', address);
+    window.connectWallet && connectWallet();
+    return address;
+  } catch (e) { alert('wallet error: ' + e.message); return null; }
+}
+
+async function sendDeposit(to, weiValue){
+  const provider = new ethers.BrowserProvider(window.ethereum);
+  const signer = await provider.getSigner();
+  const tx = await signer.sendTransaction({ to, value: weiValue });
+  const status = document.getElementById('result');
+  status.textContent = 'deposit tx sent: '+tx.hash+' — waiting confirmation...';
+  const receipt = await tx.wait();
+  return receipt;
+}
+
 async function submitCreate(){
   const sender = (typeof connected === 'string') ? connected : null;
+  const depositStr = document.getElementById('deposit').value || '0.01';
+  const depositVal = parseFloat(depositStr);
+  if (isNaN(depositVal) || depositVal < 0.01) {
+    document.getElementById('result').textContent = 'ERROR: minimum deposit is 0.01 ETH';
+    return;
+  }
+  const addr = await ensureWallet();
+  if (!addr) { document.getElementById('result').textContent = 'ERROR: wallet not connected'; return; }
   const payload = {
     name: document.getElementById('name').value,
     persona: document.getElementById('persona').value,
     keyword: document.getElementById('keyword').value,
     creator: document.getElementById('creator').value,
-    deposit: document.getElementById('deposit').value || '0.01',
-    sender: sender,
+    deposit: depositStr,
+    sender: addr,
   };
-  const depositVal = parseFloat(payload.deposit);
-  if (isNaN(depositVal) || depositVal < 0.01) {
-    document.getElementById('result').textContent = 'ERROR: minimum deposit is 0.01 ETH';
-    return;
-  }
-  const res = await fetch('/api/agent/create', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify(payload),
-  });
-  const data = await res.json();
-  const el = document.getElementById('result');
-  if(data.ok){
-    el.textContent = 'DEPLOYED: agent #'+data.id+' | vault='+data.vault+' ETH | keyword set';
-    setTimeout(()=>location.href='/agent/'+data.id, 1200);
-  } else {
-    el.textContent = 'ERROR: '+(data.error||'unknown');
+  try {
+    document.getElementById('result').textContent = 'sending '+depositStr+' ETH to treasury...';
+    const wei = ethers.parseEther(depositStr);
+    const receipt = await sendDeposit(TREASURY, wei);
+    payload.tx_hash = receipt.hash;
+    const res = await fetch('/api/agent/create', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    const el = document.getElementById('result');
+    if(data.ok){
+      el.textContent = 'DEPLOYED: agent #'+data.id+' | vault='+data.vault+' ETH | tx='+payload.tx_hash;
+      setTimeout(()=>location.href='/agent/'+data.id, 1200);
+    } else {
+      el.textContent = 'ERROR: '+(data.error||'unknown');
+    }
+  } catch(e){
+    document.getElementById('result').textContent = 'ERROR: ' + e.message;
   }
 }
 function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
