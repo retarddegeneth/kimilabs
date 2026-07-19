@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>kimilabs</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a0a0a;
+      color: #CCFF00;
+      font-family: "Courier New", Courier, monospace;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container { max-width: 800px; width: 100%; text-align: center; }
+    .terminal {
+      border: 1px solid #CCFF00;
+      border-radius: 6px;
+      padding: 40px;
+      background: #000;
+      box-shadow: 0 0 60px rgba(204,255,0,0.15);
+    }
+    h1 { font-size: 2.5em; margin-bottom: 20px; letter-spacing: 4px; }
+    .prompt { color: #CCFF00; font-size: 1.2em; margin: 15px 0; text-align: left; }
+    .prompt::before { content: "> "; color: #CCFF00; }
+    a { color: #CCFF00; text-decoration: none; border-bottom: 1px dashed #CCFF00; }
+    a:hover { border-bottom-style: solid; }
+    .muted { color: #666; font-size: 0.85em; margin-top: 30px; }
+    .blink { animation: blinker 1.5s step-end infinite; }
+    @keyframes blinker { 50% { opacity: 0; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="terminal">
+      <h1>kimilabs.xyz</h1>
+      <p class="prompt">initializing...</p>
+      <p class="prompt">loading interfaces...</p>
+      <p class="prompt">status: <span style="color:#CCFF00;">online</span></p>
+      <p class="prompt">chain id: <span style="color:#666;">[redacted]</span></p>
+      <p class="prompt">site: <a href="https://retarddegeneth.github.io/bankr-shilling" target="_blank">bankr tracker</a></p>
+      <p class="prompt">github: <a href="https://github.com/retarddegeneth/bankr-shilling" target="_blank">retarddegeneth/bankr-shilling</a></p>
+      <p class="prompt">contract: <code id="caText">loading...</code></p>
+      <p class="muted">kimilabs © 2026 — built by retarddegeneth</p>
+      <p class="prompt blink">_</p>
+    </div>
+  </div>
+  <script>
+    var CONTRACT = "LOADING";
+    var el = document.getElementById("caText");
+    if (el) el.textContent = CONTRACT;
+  </script>
+</body>
+</html>
