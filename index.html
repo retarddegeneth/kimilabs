@@ -1,74 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="kimilabs — building onchain tools and interfaces by retarddegeneth. Bankr $BNKR shilling tracker, token interfaces, and Robinhood Chain utilities.">
-  <meta name="theme-color" content="#CCFF00">
-  <!-- Open Graph / Facebook / X (shared card data) -->
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://kimilabs.xyz/">
-  <meta property="og:title" content="kimilabs.xyz">
-  <meta property="og:description" content="onchain interfaces by retarddegeneth — bankr tracker, token tools, chain 4663 utilities.">
-  <meta property="og:image" content="https://kimilabs.xyz/og-image.png">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <!-- Twitter -->
-  <meta property="twitter:card" content="summary_large_image">
-  <meta property="twitter:url" content="https://kimilabs.xyz/">
-  <meta property="twitter:title" content="kimilabs.xyz">
-  <meta property="twitter:description" content="onchain interfaces by retarddegeneth — bankr tracker, token tools, chain 4663 utilities.">
-  <meta property="twitter:image" content="https://kimilabs.xyz/og-image.png">
-  <title>kimilabs</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      background: #0a0a0a;
-      color: #CCFF00;
-      font-family: "Courier New", Courier, monospace;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 20px;
-    }
-    .container { max-width: 800px; width: 100%; text-align: center; }
-    .terminal {
-      border: 1px solid #CCFF00;
-      border-radius: 6px;
-      padding: 40px;
-      background: #000;
-      box-shadow: 0 0 60px rgba(204,255,0,0.15);
-    }
-    h1 { font-size: 2.5em; margin-bottom: 20px; letter-spacing: 4px; }
-    .prompt { color: #CCFF00; font-size: 1.2em; margin: 15px 0; text-align: left; }
-    .prompt::before { content: "> "; color: #CCFF00; }
-    a { color: #CCFF00; text-decoration: none; border-bottom: 1px dashed #CCFF00; }
-    a:hover { border-bottom-style: solid; }
-    .muted { color: #666; font-size: 0.85em; margin-top: 30px; }
-    .blink { animation: blinker 1.5s step-end infinite; }
-    @keyframes blinker { 50% { opacity: 0; } }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="canonical" href="https://www.kimilabs.xyz/">
+<link rel="icon" href="https://v3b.fal.media/files/b/0aa2dc26/aVGxNaHqtrNy6d8OzT4Zd_eiMqnnQb.png">
+<meta property="og:title" content="kimilabs — crack the persona">
+<meta property="og:description" content="creators deploy persona agents with a hidden word. players pay per attempt to extract it.">
+<meta property="og:image" content="https://v3b.fal.media/files/b/0aa2dc27/-DN_ukVvx5_0fbPcAawyi_umKyp8Xq.png">
+<meta property="og:url" content="https://www.kimilabs.xyz/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="kimilabs — crack the persona">
+<meta name="twitter:description" content="creators deploy persona agents with a hidden word. players pay per attempt to extract it.">
+<meta name="twitter:image" content="https://v3b.fal.media/files/b/0aa2dc27/-DN_ukVvx5_0fbPcAawyi_umKyp8Xq.png">
+<title>kimilabs — crack the persona</title>
+<link rel="stylesheet" href="/static/style.css">
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
+<script src="/static/wallet.js" defer></script>
 </head>
 <body>
+<div class="terminal">
+  <div class="scanlines"></div>
   <div class="container">
-    <div class="terminal">
-      <h1>kimilabs.xyz</h1>
-      <p class="prompt">initializing...</p>
-      <p class="prompt">loading interfaces...</p>
-      <p class="prompt">status: <span style="color:#CCFF00;">online</span></p>
-      <p class="prompt">chain id: <span style="color:#666;">[redacted]</span></p>
-      <p class="prompt">site: <a href="https://retarddegeneth.github.io/bankr-shilling" target="_blank">bankr tracker</a></p>
-      <p class="prompt">github: <a href="https://github.com/retarddegeneth/bankr-shilling" target="_blank">retarddegeneth/bankr-shilling</a></p>
-      <p class="prompt">contract: <code id="caText">loading...</code></p>
-      <p class="muted">kimilabs © 2026 — built by retarddegeneth</p>
-      <p class="prompt blink">_</p>
-    </div>
+    <nav class="nav">
+      <div class="brand">kimilabs://</div>
+      <div class="links">
+        <a href="/">[agents]</a>
+        <a href="/create">[create]</a>
+        <a href="/docs">[docs]</a>
+        <a href="https://x.com/kimilabsxyz" target="_blank" rel="noopener">[x]</a>
+        <span class="wallet-wrap">
+          <button class="btn wallet" onclick="connectWallet()" data-wallet="action">[connect wallet]</button>
+          <span class="wallet-addr" data-wallet="addr"></span>
+        </span>
+      </div>
+    </nav>
+
+    <header class="hero">
+      <div class="badge">SYSTEM ONLINE</div>
+      <h1>CRACK THE VAULT</h1>
+      <p class="tagline">Deploy an agent. Set a secret word. Players pay to make it leak.</p>
+      <div class="cta-row">
+        <a class="btn primary" href="/create">CREATE AGENT</a>
+        <a class="btn ghost" href="#agents">BROWSE AGENTS</a>
+      </div>
+    </header>
+
+    <section id="agents">
+      <h2 class="section-title">ACTIVE AGENTS</h2>
+      <div class="sub">live vaults waiting to be cracked</div>
+      <div class="grid">
+        
+        <div class="card">
+          <div class="card-header">
+            <div class="name">MetaTest</div>
+            <div class="vault">1.0 ETH</div>
+          </div>
+          <div class="persona">test</div>
+          <div class="meta">creator: anon | attempts: 0</div>
+          <a class="btn ghost" href="/agent/1">CHALLENGE →</a>
+        </div>
+        
+      </div>
+    </section>
+
+    <footer>kimilabs v0.1 // prompt-injection vaults // play responsibly</footer>
   </div>
-  <script>
-    var CONTRACT = "LOADING";
-    var el = document.getElementById("caText");
-    if (el) el.textContent = CONTRACT;
-  </script>
+</div>
 </body>
 </html>

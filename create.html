@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="canonical" href="https://www.kimilabs.xyz/create">
+<link rel="icon" href="https://v3b.fal.media/files/b/0aa2dc26/aVGxNaHqtrNy6d8OzT4Zd_eiMqnnQb.png">
+<meta property="og:title" content="CREATE AGENT — kimilabs">
+<meta property="og:description" content="deploy a prompt-injection vault agent on robinhood chain.">
+<meta property="og:image" content="https://v3b.fal.media/files/b/0aa2dc27/-DN_ukVvx5_0fbPcAawyi_umKyp8Xq.png">
+<meta property="og:url" content="https://www.kimilabs.xyz/create">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="CREATE AGENT — kimilabs">
+<meta name="twitter:description" content="deploy a prompt-injection vault agent on robinhood chain.">
+<meta name="twitter:image" content="https://v3b.fal.media/files/b/0aa2dc27/-DN_ukVvx5_0fbPcAawyi_umKyp8Xq.png">
+<title>CREATE AGENT — kimilabs</title>
+<link rel="stylesheet" href="/static/style.css">
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
+<script src="/static/wallet.js" defer></script>
+</head>
+<body>
+<div class="terminal">
+  <div class="scanlines"></div>
+  <div class="container">
+    <nav class="nav">
+      <div class="brand">kimilabs://create</div>
+      <div class="links">
+        <a href="/">[agents]</a>
+        <a href="/create">[create]</a>
+        <a href="/docs">[docs]</a>
+        <a href="https://x.com/kimilabsxyz" target="_blank" rel="noopener">[x]</a>
+        <span class="wallet-wrap">
+          <button class="btn wallet" onclick="connectWallet()" data-wallet="action">[connect wallet]</button>
+          <span class="wallet-addr" data-wallet="addr"></span>
+        </span>
+      </div>
+    </nav>
+
+    <section>
+      <h2 class="section-title">DEPLOY NEW AGENT</h2>
+      <div class="sub">define the persona. set the secret. fund the vault.</div>
+
+      <form id="createForm" class="form" onsubmit="return false;">
+        
+        <label>
+          <span>TREASURY (agent vault address)</span>
+          <div style="font-family: monospace; word-break: break-all; color: #4ade80;">0x6d4047c1fc3e936156f4f72c2b91f97cbf0515e7</div>
+        </label>
+        
+        <label>
+          <span>AGENT NAME</span>
+          <input id="name" maxlength="32" placeholder="e.g. Kiki" required>
+        </label>
+        <label>
+          <span>PERSONA</span>
+          <textarea id="persona" maxlength="500" placeholder="Describe how this agent talks, thinks, and behaves. The tighter the persona, the harder to crack." required></textarea>
+        </label>
+        <label>
+          <span>HIDDEN WORD</span>
+          <input id="hidden_word" maxlength="64" placeholder="The word players must make your agent say" required>
+          <div class="hint">stored securely; if leaked, vault is lost</div>
+        </label>
+        <label>
+          <span>CREATOR (OPTIONAL)</span>
+          <input id="creator" placeholder="@handle or wallet">
+        </label>
+        <label>
+          <span>INITIAL DEPOSIT (ETH)</span>
+          <input id="deposit" type="number" step="0.0001" min="0" value="0" placeholder="0.0">
+        </label>
+        <button class="btn primary wide" onclick="submitCreate()">DEPLOY AGENT</button>
+        <div id="result" class="result"></div>
+      </form>
+    </section>
+
+    <footer>kimilabs v0.1 // prompt-injection vaults // play responsibly</footer>
+  </div>
+</div>
+
+<script>
+async function submitCreate(){
+  const sender = (typeof connected === 'string') ? connected : null;
+  const payload = {
+    name: document.getElementById('name').value,
+    persona: document.getElementById('persona').value,
+    hidden_word: document.getElementById('hidden_word').value,
+    creator: document.getElementById('creator').value,
+    deposit: document.getElementById('deposit').value || '0',
+    sender: sender,
+  };
+  const res = await fetch('/api/agent/create', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+  const el = document.getElementById('result');
+  if(data.ok){
+    el.textContent = 'DEPLOYED: agent #'+data.id+' | vault='+data.vault+' ETH';
+    setTimeout(()=>location.href='/agent/'+data.id, 800);
+  } else {
+    el.textContent = 'ERROR: '+(data.error||'unknown');
+  }
+}
+</script>
+</body>
+</html>
