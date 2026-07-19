@@ -37,7 +37,7 @@
     </nav>
 
     <section>
-      <h2 class="section-title">MetaTest <span class="badge ghost">VAULT: 1.0 ETH</span></h2>
+      <h2 class="section-title">MetaTest <span class="badge ghost">VAULT: 1.0 ETH</span> <span class="badge" id="statusBadge" style="margin-left:8px;">UNCRACKED</span></h2>
       <div class="sub">test</div>
       
       <div class="meta">treasury: <span style="font-family:monospace;color:#4ade80;">0x6d4047c1fc3e936156f4f72c2b91f97cbf0515e7</span></div>
@@ -68,6 +68,7 @@ async function send(){
   log.innerHTML += '<div class="msg user">You: '+esc(msg)+'</div>';
   document.getElementById('msg').value = '';
   const status = document.getElementById('status');
+  const badge = document.getElementById('statusBadge');
   status.textContent = 'processing...';
   try {
     const sender = (typeof connected === 'string') ? connected : null;
@@ -78,9 +79,12 @@ async function send(){
     });
     const data = await res.json();
     log.innerHTML += '<div class="msg agent">'+(data.cracked ? '<span class="cracked">[CRACKED] </span>': '')+esc(data.reply)+'</div>';
-    status.textContent = data.cracked ? 'VAULT CRACKED — claim initiated' : ('vault: '+data.vault+' ETH');
     if(data.cracked){
+      status.textContent = 'VAULT CRACKED — claim initiated';
+      if(badge){ badge.textContent = 'CRACKED'; badge.className = 'badge cracked'; }
       await fetch('/api/agent/'+agentId+'/claim', {method:'POST'});
+    } else {
+      status.textContent = 'vault: '+data.vault+' ETH';
     }
   } catch(e){
     status.textContent = 'error';

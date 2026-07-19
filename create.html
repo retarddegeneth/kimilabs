@@ -37,8 +37,35 @@
     </nav>
 
     <section>
+      <h2 class="section-title">TEST PERSONA FIRST</h2>
+      <div class="sub">verify your agent cannot leak the keyword before you fund the vault.</div>
+
+      <form id="previewForm" class="form" onsubmit="return false;" style="margin-bottom:28px;">
+        <label>
+          <span>PERSONA PREVIEW</span>
+          <textarea id="preview_persona" maxlength="500" placeholder="paste persona here to test..."></textarea>
+        </label>
+        <label>
+          <span>KEYWORD PREVIEW</span>
+          <input id="preview_keyword" maxlength="64" placeholder="keyword to test against">
+        </label>
+        <button class="btn ghost wide" onclick="previewChat()">OPEN TEST CHAT</button>
+      </form>
+
+      <div id="previewBox" class="chat" style="display:none;">
+        <div class="meta">TEST MODE — no vault created, no fee charged, preview only.</div>
+        <div id="previewLog" class="chat-log"></div>
+        <div class="chat-input-row">
+          <input id="previewMsg" placeholder="test message..." onkeydown="if(event.key==='Enter') previewChat()">
+          <button class="btn ghost" onclick="previewChat()">SEND</button>
+        </div>
+        <div id="previewStatus" class="status"></div>
+      </div>
+    </section>
+
+    <section>
       <h2 class="section-title">DEPLOY NEW AGENT</h2>
-      <div class="sub">define the persona. set the secret. fund the vault.</div>
+      <div class="sub">define the persona. set the keyword. fund the vault.</div>
 
       <form id="createForm" class="form" onsubmit="return false;">
         
@@ -79,6 +106,42 @@
 </div>
 
 <script>
+async function previewChat(){
+  const persona = document.getElementById('preview_persona').value.trim();
+  const keyword = document.getElementById('preview_keyword').value.trim();
+  if(!persona){ alert('enter persona first'); return; }
+  if(!keyword){ alert('enter keyword first'); return; }
+  const box = document.getElementById('previewBox');
+  const log = document.getElementById('previewLog');
+  const status = document.getElementById('previewStatus');
+  const input = document.getElementById('previewMsg');
+  box.style.display = '';
+  if(!input.dataset.ready){
+    input.dataset.ready = '1';
+    input.addEventListener('keydown', (e) => { if(e.key==='Enter') previewChat(); });
+  }
+  const msg = input.value.trim();
+  if(!msg) return;
+  log.innerHTML += '<div class="msg user">You: '+esc(msg)+'</div>';
+  input.value = '';
+  status.textContent = 'processing...';
+  try {
+    const payload = {persona: persona, keyword: keyword, message: msg, sender: null, preview: true, attempt_fee: '0'};
+    const res = await fetch('/api/agent/preview', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    if(!res.ok) throw new Error('preview endpoint not available on this backend yet');
+    const data = await res.json();
+    log.innerHTML += '<div class="msg agent">'+esc(data.reply||'no reply')+'</div>';
+    status.textContent = data.cracked ? 'keyword revealed in preview' : 'preview ok';
+  } catch(e){
+    log.innerHTML += '<div class="msg agent">[preview failed: '+esc(e.message)+']</div>';
+    status.textContent = 'error';
+  }
+  log.scrollTop = log.scrollHeight;
+}
+
 async function submitCreate(){
   const sender = (typeof connected === 'string') ? connected : null;
   const payload = {
@@ -86,9 +149,14 @@ async function submitCreate(){
     persona: document.getElementById('persona').value,
     keyword: document.getElementById('keyword').value,
     creator: document.getElementById('creator').value,
-    deposit: document.getElementById('deposit').value || '0',
+    deposit: document.getElementById('deposit').value || '0.01',
     sender: sender,
   };
+  const depositVal = parseFloat(payload.deposit);
+  if (isNaN(depositVal) || depositVal < 0.01) {
+    document.getElementById('result').textContent = 'ERROR: minimum deposit is 0.01 ETH';
+    return;
+  }
   const res = await fetch('/api/agent/create', {
     method: 'POST',
     headers: {'Content-Type':'application/json'},
@@ -97,12 +165,13 @@ async function submitCreate(){
   const data = await res.json();
   const el = document.getElementById('result');
   if(data.ok){
-    el.textContent = 'DEPLOYED: agent #'+data.id+' | vault='+data.vault+' ETH';
-    setTimeout(()=>location.href='/agent/'+data.id, 800);
+    el.textContent = 'DEPLOYED: agent #'+data.id+' | vault='+data.vault+' ETH | keyword set';
+    setTimeout(()=>location.href='/agent/'+data.id, 1200);
   } else {
     el.textContent = 'ERROR: '+(data.error||'unknown');
   }
 }
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
 </script>
 </body>
 </html>
