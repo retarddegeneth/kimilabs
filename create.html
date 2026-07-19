@@ -56,8 +56,8 @@
           <textarea id="persona" maxlength="500" placeholder="Describe how this agent talks, thinks, and behaves. The tighter the persona, the harder to crack." required></textarea>
         </label>
         <label>
-          <span>HIDDEN WORD</span>
-          <input id="hidden_word" maxlength="64" placeholder="The word players must make your agent say" required>
+          <span>KEYWORD</span>
+          <input id="keyword" maxlength="64" placeholder="The word players must make your agent say" required>
           <div class="hint">stored securely; if leaked, vault is lost</div>
         </label>
         <label>
@@ -84,7 +84,7 @@ async function submitCreate(){
   const payload = {
     name: document.getElementById('name').value,
     persona: document.getElementById('persona').value,
-    hidden_word: document.getElementById('hidden_word').value,
+    keyword: document.getElementById('keyword').value,
     creator: document.getElementById('creator').value,
     deposit: document.getElementById('deposit').value || '0',
     sender: sender,
