@@ -106,3 +106,16 @@ footer strong { color: var(--neon); }
   .links a { margin-left: 0; margin-right: 12px; }
   .grid { grid-template-columns: 1fr; }
 }
+
+.persona-box {
+  border: 1px dashed #333;
+  border-radius: 6px;
+  padding: 18px;
+  background: #050505;
+  color: #aaa;
+  font-size: 0.95em;
+  line-height: 1.6;
+  text-align: left;
+  margin-bottom: 20px;
+}
+.persona-box strong { color: #CCFF00; }
