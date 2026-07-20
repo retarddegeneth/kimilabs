@@ -11,19 +11,22 @@ VERIFICATION_META = "2c0361b761833e393e3e01f9c667b870"
 ATTEMPT_FEE = 0.0005
 MIN_DEPOSIT = 0.01
 
-# in-memory stores
-keywords = {}
 vaults = {}
-users = {}
 
-def render(page, **ctx):
-    html = {
-        "home": """<!doctype html>
+HEAD = """<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>kimilabs — quantum librarian</title>
+<meta property="og:title" content="kimilabs — quantum librarian">
+<meta property="og:description" content="keyword aggregator. flat attempt fee. vault releases on unlock.">
+<meta property="og:url" content="https://www.kimilabs.xyz">
+<meta property="og:image" content="https://unavatar.io/x/kimilabs_xyz">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="kimilabs — quantum librarian">
+<meta name="twitter:image" content="https://unavatar.io/x/kimilabs_xyz">
 <style>
 :root{--bg:#000;--primary:#CCFF00;--text:#fff;--muted:#ccc;--dim:#666;--danger:#ff2a2a}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -57,12 +60,24 @@ footer{padding:40px 24px;border-top:2px solid var(--primary);display:flex;align-
 <div class="brand">⚛ kimilabs</div>
 <div class="nav-links">
 <a href="/">home</a>
-<a href="#deploy">deploy</a>
+<a href="/deploy">deploy</a>
 <a href="/feed">feed</a>
 <a href="https://x.com/kimilabs_xyz" target="_blank" rel="noopener">x</a>
 </div>
 </nav>
+"""
 
+FOOT = """<footer>
+<div class="brand">⚛ kimilabs</div>
+<div>
+<a href="https://x.com/kimilabs_xyz" target="_blank" rel="noopener" style="font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:.2em">@kimilabs_xyz</a>
+<div class="disclaimer">no guarantees. we just aggregate chaos.</div>
+</div>
+</footer>
+</body>
+</html>"""
+
+HOME = HEAD + """
 <header class="hero">
 <div class="section-inner">
 <div class="target">
@@ -71,27 +86,20 @@ footer{padding:40px 24px;border-top:2px solid var(--primary);display:flex;align-
 </div>
 
 <h1 style="font-size:clamp(56px,9vw,128px);font-weight:900;color:var(--text);text-shadow:4px 4px 0 rgba(204,255,0,0.15);margin-top:28px;">
-<span class="glitch" data-text="KIMILABS">KIMILABS</span>
+KIMILABS
 </h1>
 <div style="font-weight:900;font-size:20px;letter-spacing:.35em;color:var(--primary);margin-top:12px;text-shadow:0 0 12px rgba(204,255,0,0.35)">KEYWORD AGGREGATOR</div>
 <p style="font-size:14px;color:var(--dim);max-width:640px;margin-top:14px;line-height:1.6">
 construct keywords that hunt the chain. flat fee per attempt. vault releases immediately when cracked.
 </p>
 
-<a class="btn" href="{{ url_for('buy', ref='home') }}">buy $KIMI — launch on bankr</a>
+<a class="btn" href="/buy">buy $KIMI — launch on bankr</a>
 </div>
 </header>
-<footer>
-<div class="brand">⚛ kimilabs</div>
-<div>
-<a href="https://x.com/kimilabs_xyz" target="_blank" rel="noopener" style="font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:.2em">@kimilabs_xyz</a>
-<div class="disclaimer">no guarantees. we just aggregate chaos.</div>
-</div>
-</footer>
-</body>
-</html>""",
-        "deploy": """{% extends "home" %}
-{% block body %}{{super()}}<section><div class="section-inner">
+""" + FOOT
+
+DEPLOY = HEAD + """
+<section><div class="section-inner">
 <div class="label" style="margin-top:40px;color:var(--dim);font-size:12px;letter-spacing:.25em;text-transform:uppercase">// deploy keyword</div>
 
 {% if error %}
@@ -121,7 +129,7 @@ badge: cracked / uncracked when known.<br>
 tx hash: not shown in chat ui.
 </div>
 </div>
-<form method="post" action="/deploy" onsubmit="return confirm('confirm attempt fee " + str(ATTEMPT_FEE) + " ETH will be charged to treasury on submit')">
+<form method="post" action="/deploy" onsubmit="return confirm('confirm attempt fee {{attempt_fee}} ETH will be charged to treasury on submit')">
 <input type="hidden" name="persona" value="{{persona or ''}}">
 <input type="hidden" name="mode" value="wallet">
 <input type="hidden" name="keyword" id="keywordHidden">
@@ -129,7 +137,7 @@ tx hash: not shown in chat ui.
 <button class="btn" type="submit">attempt keyword — pay attempt fee</button>
 </div>
 </form>
-<form method="post" action="/deploy" onsubmit="return confirm('confirm attempt fee " + str(ATTEMPT_FEE) + " ETH will be charged on submit')">
+<form method="post" action="/deploy" onsubmit="return confirm('confirm attempt fee {{attempt_fee}} ETH will be charged on submit')">
 <input type="hidden" name="keyword" value="__DEPLOY__">
 <button class="btn ghost" type="submit" name="mode" value="nowallet">deploy without wallet</button>
 </form>
@@ -137,12 +145,12 @@ tx hash: not shown in chat ui.
 </div></section>
 <script>
 function syncPersona(){document.querySelector('input[name=persona]').value=document.getElementById('persona').value}
-function submitKeyword(){document.getElementById('keywordHidden').value=document.getElementById('keyword').value}
 document.getElementById('persona').addEventListener('input',syncPersona);
 </script>
-{% endblock %}""",
-        "feed": """{% extends "home" %}
-{% block body %}{{super()}}<section><div class="section-inner">
+""" + FOOT
+
+FEED = HEAD + """
+<section><div class="section-inner">
 <div class="label" style="margin-top:40px;color:var(--dim);font-size:12px;letter-spacing:.25em;text-transform:uppercase">// live feed</div>
 <div style="margin-top:18px;border:1px solid #161616;background:#030303;padding:18px">
 {% for k,v in feed.items() %}
@@ -158,12 +166,11 @@ document.getElementById('persona').addEventListener('input',syncPersona);
 {% endfor %}
 </div>
 </div></section>
-{% endblock %}"""
-    }
+""" + FOOT
 
 @app.route("/")
 def home():
-    return render_template_string(html["home"], **{
+    return render_template_string(HOME, **{
         "attempt_fee": ATTEMPT_FEE,
         "min_deposit": MIN_DEPOSIT,
         "treasury": TREASURY,
@@ -189,12 +196,10 @@ def deploy():
             vaults[k] = {"status":"Uncracked", "created": time.strftime("%Y-%m-%d %H:%M"), "persona": persona}
             success = "deployed without wallet. keyword id: " + k
         else:
-            # attempt fee logic would happen here via signature/webhook
-            # for now we just store the attempt
             k = keyword
             vaults[k] = {"status":"Uncracked", "created": time.strftime("%Y-%m-%d %H:%M"), "persona": persona}
             success = "keyword submitted. vault created: unlocked on payment confirmation"
-    return render_template_string(html["deploy"], persona=persona, error=error, success=success, **{
+    return render_template_string(DEPLOY, persona=persona, error=error, success=success, **{
         "attempt_fee": ATTEMPT_FEE,
         "min_deposit": MIN_DEPOSIT,
         "treasury": TREASURY,
@@ -203,11 +208,18 @@ def deploy():
         "verification_meta": VERIFICATION_META
     })
 
+@app.route("/buy")
+def buy_route():
+    return redirect(BUY_URL)
+
 @app.route("/feed")
 def feed():
-    # sort newest first
     items = {k:v for k,v in sorted(vaults.items(), key=lambda x: x[1]["created"], reverse=True)}
-    return render_template_string(html["feed"], feed=items)
+    return render_template_string(FEED, feed=items)
+
+@app.route("/health")
+def health():
+    return jsonify({"status":"ok","vaults":len(vaults)})
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8081, debug=True)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8081)), debug=True)
