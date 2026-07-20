@@ -93,7 +93,7 @@ KIMILABS
 construct keywords that hunt the chain. flat fee per attempt. vault releases immediately when cracked.
 </p>
 
-<a class="btn" href="/buy">buy $KIMI — launch on bankr</a>
+<a class="btn" href="/deploy">deploy keyword</a>
 </div>
 </header>
 """ + FOOT
@@ -207,10 +207,6 @@ def deploy():
         "buy_url": BUY_URL,
         "verification_meta": VERIFICATION_META
     })
-
-@app.route("/buy")
-def buy_route():
-    return redirect(BUY_URL)
 
 @app.route("/feed")
 def feed():
