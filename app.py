@@ -62,7 +62,7 @@ footer{padding:40px 24px;border-top:2px solid var(--primary);display:flex;align-
 <a href="/">home</a>
 <a href="/deploy">deploy</a>
 <a href="/feed">feed</a>
-<a href="https://x.com/kimilabs_xyz" target="_blank" rel="noopener">x</a>
+<a href="https://x.com/kimilabsxyz" target="_blank" rel="noopener">x</a>
 </div>
 </nav>
 """
@@ -70,7 +70,7 @@ footer{padding:40px 24px;border-top:2px solid var(--primary);display:flex;align-
 FOOT = """<footer>
 <div class="brand">⚛ kimilabs</div>
 <div>
-<a href="https://x.com/kimilabs_xyz" target="_blank" rel="noopener" style="font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:.2em">@kimilabs_xyz</a>
+<a href="https://x.com/kimilabsxyz" target="_blank" rel="noopener" style="font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:.2em">@kimilabs_xyz</a>
 <div class="disclaimer">no guarantees. we just aggregate chaos.</div>
 </div>
 </footer>
