@@ -5,8 +5,8 @@ app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", os.urandom(32).hex())
 
 TREASURY = "0x6d4047c1fc3e936156f4f72c2b91f97cbf0515e7"
-CA = "0xf02b55bfb531557d106b9b5ac97a16b3795ebba3"
-BUY_URL = "https://bankr.bot/launches/0xf02b55bfb531557d106b9b5ac97a16b3795ebba3"
+CA = "0x540077bc8236e7a8e6bd8be73cb632b888551e18"
+BUY_URL = "https://app.long.xyz/tokens/0x540077Bc8236E7A8E6BD8bE73Cb632B888551e18"
 VERIFICATION_META = "2c0361b761833e393e3e01f9c667b870"
 ATTEMPT_FEE = 0.0005
 MIN_DEPOSIT = 0.01
@@ -72,6 +72,11 @@ FOOT = """<footer>
 <div>
 <a href="https://x.com/kimilabsxyz" target="_blank" rel="noopener" style="font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:.2em">@kimilabs_xyz</a>
 <div class="disclaimer">no guarantees. we just aggregate chaos.</div>
+<div class="token-bar" style="margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+<span style="font-size:12px;color:#666;text-transform:uppercase;letter-spacing:.15em">token</span>
+<code style="font-size:12px;color:#ccc;word-break:break-all;flex:1;min-width:120px">{{ca}}</code>
+<a class="btn" href="{{buy_url}}" target="_blank" rel="noopener" style="font-size:11px;padding:10px 16px">buy</a>
+</div>
 </div>
 </footer>
 </body>
